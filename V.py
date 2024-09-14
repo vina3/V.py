@@ -1,29 +1,28 @@
-streamlit torch transformers diffusers pip install
+pip install streamlit pandas
 import streamlit as st
-from PIL import Image
-import torch
-from transformers import CLIPTextModel, CLIPTokenizer
-from diffusers import StableDiffusionPipeline
+import pandas as pd
 
-# Initialize Stable Diffusion Pipeline
-@st.cache_resource
-def load_model():
-    model_id = "CompVis/stable-diffusion-v1-4"
-    pipe = StableDiffusionPipeline.from_pretrained(model_id)
-    pipe.to("cuda" if torch.cuda.is_available() else "cpu")
-    return pipe
+# Load dataset
+@st.cache
+def load_data():
+    return pd.read_csv('data.csv')
 
-pipe = load_model()
+data = load_data()
 
 # Streamlit app layout
-st.title("AI Image Generator with Stable Diffusion")
+st.title("Simple Search Engine")
 
-# Input from the user
-prompt = st.text_input("Enter a prompt to generate an image:")
+# Input for search
+search_query = st.text_input("Search for:")
 
-# Generate and display the image
-if prompt:
-    if st.button("Generate Image"):
-        with st.spinner("Generating image..."):
-            image = pipe(prompt).images[0]
-            st.image(image, caption="Generated Image", use_column_width=True)
+if search_query:
+    # Filter data based on search query
+    results = data[data['title'].str.contains(search_query, case=False, na=False)]
+    
+    if not results.empty:
+        st.write(f"Found {len(results)} result(s):")
+        for _, row in results.iterrows():
+            st.subheader(row['title'])
+            st.write(row['description'])
+    else:
+        st.write("No results found.")
