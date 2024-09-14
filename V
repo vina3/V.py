@@ -1,0 +1,33 @@
+import streamlit as st
+import openai
+
+# Title of the app
+st.title("ChatGPT-powered App")
+
+# Get the OpenAI API key from the user
+api_key = st.text_input("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", type="qwer1234")
+
+# Function to generate a response
+def generate_response(prompt):
+    openai.api_key = api_key
+    response = openai.Completion.create(
+        engine="gpt-3.5-turbo",  # or 'gpt-4' if you have access
+        prompt=prompt,
+        max_tokens=150,
+        n=1,
+        stop=None,
+        temperature=0.7,
+    )
+    return response.choices[0].text.strip()
+
+# User input for conversation
+if api_key:
+    user_input = st.text_input("You:", "")
+
+    if user_input:
+        # Display the generated response
+        output = generate_response(user_input)
+        st.text_area("ChatGPT:", value=output, height=200)
+else:
+    st.warning("Please enter your OpenAI API key to start the chat.")
+
