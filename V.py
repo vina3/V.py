@@ -1,28 +1,34 @@
-pip install streamlit pandas
 import streamlit as st
-import pandas as pd
+from PIL import Image
 
-# Load dataset
-@st.cache
-def load_data():
-    return pd.read_csv('data.csv')
+import style
 
-data = load_data()
+st.title('PyTorch Style Transfer')
 
-# Streamlit app layout
-st.title("Simple Search Engine")
+img = st.sidebar.selectbox(
+    'Select Image',
+    ('amber.jpg', 'cat.png')
+)
 
-# Input for search
-search_query = st.text_input("Search for:")
+style_name = st.sidebar.selectbox(
+    'Select Style',
+    ('candy', 'mosaic', 'rain_princess', 'udnie')
+)
 
-if search_query:
-    # Filter data based on search query
-    results = data[data['title'].str.contains(search_query, case=False, na=False)]
-    
-    if not results.empty:
-        st.write(f"Found {len(results)} result(s):")
-        for _, row in results.iterrows():
-            st.subheader(row['title'])
-            st.write(row['description'])
-    else:
-        st.write("No results found.")
+model= "saved_models/" + style_name + ".pth"
+input_image = "images/content-images/" + img
+output_image = "images/output-images/" + style_name + "-" + img
+
+st.write('### Source image:')
+image = Image.open(input_image)
+st.image(image, width=400) # image: numpy array
+
+clicked = st.button('Stylize')
+
+if clicked:
+    model = style.load_model(model)
+    style.stylize(model, input_image, output_image)
+
+    st.write('### Output image:')
+    image = Image.open(output_image)
+    st.image(image, width=400)
