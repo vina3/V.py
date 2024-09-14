@@ -21,11 +21,11 @@ st.title("ChatGPT-like Web App")
 
 import streamlit as st
 
- this loop will let us ask questions continuously
+ #this loop will let us ask questions continuously
 
 while True:
     
-     Set up the model and prompt
+     #Set up the model and prompt
     model_engine = "text-davinci-003"
     
     prompt = input('Enter new prompt: ')
@@ -33,7 +33,7 @@ while True:
     if 'exit' in prompt or 'quit' in prompt:
         break
 
-     Generate a response
+    # Generate a response
      given the most recent context (4096 characters)
      continue the text up to 2048 tokens ~ 8192 charaters
     completion = openai.Completion.create(
