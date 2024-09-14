@@ -1,3 +1,4 @@
+streamlit torch transformers diffusers pip install
 import streamlit as st
 from PIL import Image
 import torch
