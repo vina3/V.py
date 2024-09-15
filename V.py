@@ -1,34 +1,44 @@
 import streamlit as st
-from PIL import Image
+import yfinance as yf
+import pandas as pd
+import numpy as np
+import time
 
-import style
+# Fetch EUR/USD data from Yahoo Finance
+def get_data():
+    eurusd = yf.download('EURUSD=X', interval='1m', period='1d')
+    return eurusd
 
-st.title('PyTorch Style Transfer')
+# Signal generator based on price movement
+def generate_signal(data):
+    data['Signal'] = np.where(data['Close'] > data['Close'].shift(1), 'Up', 'Down')
+    return data
 
-img = st.sidebar.selectbox(
-    'Select Image',
-    ('amber.jpg', 'cat.png')
-)
+# Streamlit app layout
+def main():
+    st.title("EUR/USD 1-Minute Up/Down Signal Generator")
+    
+    st.write("Fetching real-time data for EUR/USD...")
+    
+    # Placeholder for live data
+    placeholder = st.empty()
 
-style_name = st.sidebar.selectbox(
-    'Select Style',
-    ('candy', 'mosaic', 'rain_princess', 'udnie')
-)
+    while True:
+        # Get the latest data
+        data = get_data()
+        
+        # Generate signals
+        data_with_signal = generate_signal(data)
+        
+        # Display the latest data and signal
+        with placeholder.container():
+            st.write("Latest Data (EUR/USD):")
+            st.dataframe(data_with_signal.tail(5))
+            st.write(f"Latest Signal: {data_with_signal['Signal'].iloc[-1]}")
+        
+        # Pause for 1 minute before the next update
+        time.sleep(60)
 
-model= "saved_models/" + style_name + ".pth"
-input_image = "images/content-images/" + img
-output_image = "images/output-images/" + style_name + "-" + img
-
-st.write('### Source image:')
-image = Image.open(input_image)
-st.image(image, width=400) # image: numpy array
-
-clicked = st.button('Stylize')
-
-if clicked:
-    model = style.load_model(model)
-    style.stylize(model, input_image, output_image)
-
-    st.write('### Output image:')
-    image = Image.open(output_image)
-    st.image(image, width=400)
+# Run the app
+if __name__ == "__main__":
+    main()
